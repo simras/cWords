@@ -20,14 +20,14 @@ require 'thread'
 require 'java'
 require libdir + 'BinomEvaluatorMult.jar'
 require libdir + 'PermutationStats.jar'
-require libdir + 'ushuffle.jar'
-require libdir + 'DS.jar'
+#require libdir + 'ushuffle.jar'
+#require libdir + 'DS.jar'
 require libdir + 'JavaFreeMem.jar'
 java_import 'BinomEvaluatorMult'
 java_import 'JavaFreeMem'
 java_import 'PermutationStats'
-java_import 'UShuffle'
-java_import 'DS'
+#java_import 'UShuffle'
+#java_import 'DS'
 
 # Default options
 options = Hash.new
