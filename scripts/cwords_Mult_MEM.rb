@@ -86,7 +86,7 @@ $coptions = OptionParser.new do |opts|
   opts.on("-A", "--anders_ids", "Use Anders' integer IDs") {|o| options[:anders_ids] = true}
 
   # rank control
-  opts.on("-x", "--rank_split_mean", "Split ranked list at median") {|o| options[:rank_all] = false}
+  opts.on("-x", "--rank_split_mean", "Split ranked list at mean") {|o| options[:rank_all] = false}
   opts.on("-m", "--rank_split_median", "split ranked list at median") {|o| options[:rank_split_median] = true}
   opts.on("-i", "--rank_inverse", "inverse all ranked lists") {|o| options[:rank_inverse] = true}
   opts.on("-a", "--rank_abs", "rank by absolute value") {|o| options[:rank_abs] = true}
