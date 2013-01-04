@@ -22,27 +22,27 @@ jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 2
 
 Options:
 
-Usage: cwords [options]
-    -w, --wordsize ARG               word length(s) you wish to search in (default 6,7)
-    -b, --bg ARG                     Order of Markov background nucleotide model (default 2)
-    -t, --threads ARG                use multiple threads to parallelize computations (default 1)
-    -C, --custom_IDs                 Use your own sequences with matching IDs in rank and sequence files
-    -A, --anders_ids                 Use Anders' integer IDs
-    -x, --rank_split_mean            Split ranked list at mean
-    -r, --rankfile ARG               Rank file with IDs and one or more columns (will be mean collapsed) of a metric of expression changes (tab or space delimiter) or just one column with ordered IDs most down-regulated to most up-regulated
-    -s, --seqfile ARG                Sequence file - Rank and sequence IDs should be one of the compatible IDs for the species you use
-        --gen_plot ARG               Generate plot data and plots for the top k words, takes 2 passes.
-        --mkplot ARG                 Make Word Cluster Plot - highlight (with black border) the 8mer seed site (ex for miR-1: ACATTCCA) and its corresponding 7mer and 6mer seed sites. To highlight nothing write a word not in the [acgt] alphabet.
-    -N, --noAnn                      No miRNA-annotation on the Word Cluster Plot
-        --annotFile ARG              Supply you own annotations, for Word Cluster Plot and word ranking.
-        --species ARG                Different ID systems are used for different species, what's the species of your data? Currently we support Human Ensembl sequences as default (write human), Mouse (write mouse), Fruit Fly (write fruitfly) and Roundtype  Worm (write roundworm)
+    Usage: cwords [options]
+        -w, --wordsize ARG               word length(s) you wish to search in (default 6,7)
+        -b, --bg ARG                     Order of Markov background nucleotide model (default 2)
+        -t, --threads ARG                use multiple threads to parallelize computations (default 1)
+        -C, --custom_IDs                 Use your own sequences with matching IDs in rank and sequence files
+        -A, --anders_ids                 Use Anders' integer IDs
+        -x, --rank_split_mean            Split ranked list at mean
+        -r, --rankfile ARG               Rank file with IDs and one or more columns (will be mean collapsed) of a metric of expression changes (tab or space delimiter) or just one column with ordered IDs most down-regulated to most up-regulated
+        -s, --seqfile ARG                Sequence file - Rank and sequence IDs should be one of the compatible IDs for the species you use
+            --gen_plot ARG               Generate plot data and plots for the top k words, takes 2 passes.
+            --mkplot ARG                 Make Word Cluster Plot - highlight (with black border) the 8mer seed site (ex for miR-1: ACATTCCA) and its corresponding 7mer and 6mer seed sites. To highlight nothing write a word not in the [acgt] alphabet.
+        -N, --noAnn                      No miRNA-annotation on the Word Cluster Plot
+            --annotFile ARG              Supply you own annotations, for Word Cluster Plot and word ranking.
+            --species ARG                Different ID systems are used for different species, what's the species of your data? Currently we support Human Ensembl sequences as default (write human), Mouse (write mouse), Fruit Fly (write fruitfly) and Roundtype  Worm (write roundworm)
 
 ## 4. INTERPRETATION #
 
 -- invalid IDs --
 If you do not use -C the IDs in the rank-file will be mapped to the sequences. 
 
-### -- positive vs negative set -- ##
+### positive vs negative set -- ##
 The analysis is divided into 2 passes; one where words that are over represented in up-regulated genes (ie. positively correlated words) and one where negatively correlated words is evalaluated. If all genes are considered in the analysis in each pass all words of the length in question will be divided into the negative set and positive set except the words that occur 5 or less times in the sequences. These sets can be divided in different ways (see options -h), and you can consider only most regulated genes in the two passes. If you consider the most down-regulated words in the negative pass amd the most up-regulated in the positive pass a word can be present in both the negative and the positive set.
 
 ### -- The output -- ##
