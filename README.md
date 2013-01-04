@@ -35,7 +35,8 @@ Below is a short summary of how to use the software. The full set of options for
 
  
 ### Example runs:
-The following are standard analyses to run with cWords.    
+The following are standard analyses to run with cWords.
+    
     tri-nucleotide background model, word sizes 6, 7 and 8, using 40 processors
     jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 2 -p 40
 
