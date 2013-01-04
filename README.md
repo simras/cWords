@@ -21,7 +21,7 @@ Example run:
 jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 2
 
 Options:
-
+'''
 Usage: cwords [options]
     -w, --wordsize ARG               word length(s) you wish to search in (default 6,7)
     -b, --bg ARG                     Order of Markov background nucleotide model (default 2)
@@ -36,7 +36,7 @@ Usage: cwords [options]
     -N, --noAnn                      No miRNA-annotation on the Word Cluster Plot
         --annotFile ARG              Supply you own annotations, for Word Cluster Plot and word ranking.
         --species ARG                Different ID systems are used for different species, what's the species of your data? Currently we support Human Ensembl sequences as default (write human), Mouse (write mouse), Fruit Fly (write fruitfly) and Roundtype  Worm (write roundworm)
-
+'''
 4. INTERPRETATION
 
 -- invalid IDs --
@@ -47,7 +47,7 @@ The analysis is divided into 2 passes; one where words that are over represented
 
 -- The output --
 The final output of this analysis produces a summary of the top correlating words (a list for each end of the ranked list), i.e. words over-represented in beginning of list:
-
+'''
 Top 10 words
 rank      word      RS        z-score   p-value   fdr       ledge
 1         ttatc     13.92     4.00      2.00e-03  7.94e-01  449
@@ -57,7 +57,7 @@ rank      word      RS        z-score   p-value   fdr       ledge
 5         cctat     10.26     3.61      3.99e-03  4.45e-01  384
 6         tttatc    11.93     3.59      3.99e-03  3.88e-01  449
 ...
-
+'''
 The 'z-score' is a correlation statistic for the given word after correction for correlations obtained from random gene list orderings. The 'fdr' (false discovery rate) is the estimated proportion of false discoveries for the given z-score threshold. Finally, 'ledge' is the leading-edge which denotes the position in the gene list where the maximum imbalance was measured; genes before this threshold are relatively enriched for the word compared to genes after the threshold.
 
 # Mono-nucleotide dependency model
