@@ -45,9 +45,7 @@ Below is a short summary of how to use the software. The full set of options for
             --species ARG                Different ID systems are used for different species, what's the species of your data? Currently we support Human Ensembl sequences as default (write human), Mouse (write mouse) and Fruit Fly (write fruitfly)
 
 ## 4. INTERPRETATION #
-
-### invalid IDs
-If you do not use -C the IDs in the rank-file will be mapped to the sequences, when it was not possible to map the rank-file ID to a sequence we report the ID as invalid and. Problems with many invalid IDs typically occur when one uses ID associated with different versions or even assemblies (like sequences hg19 and microArray probes from hg18). Invalid IDs are written to a file facilitating further investigation (file name: invalid_ids.txt).
+Results mainly compose of three elements. A ranking of most strongly correlated word, a Word Cluster Plot and Enrichment profile plots. 
 
 ### Positive and negative set 
 The analysis is divided into 2 passes; one where words that are over represented in up-regulated genes (ie. positively correlated words) and one where negatively correlated words is evalaluated. If all genes are considered in the analysis in each pass all words of the length in question will be divided into the negative set and positive set except the words that occur 5 or less times in the sequences. These sets can be divided in different ways (see options -h), and you can consider only most regulated genes in the two passes. If you consider the most down-regulated words in the negative pass amd the most up-regulated in the positive pass a word can be present in both the negative and the positive set.
@@ -71,6 +69,9 @@ The final output of this analysis produces a summary of the top correlating word
 
 ### Plots
 Write about the plot ref. the paper
+
+### invalid IDs
+If you do not use -C the IDs in the rank-file will be mapped to the sequences, when it was not possible to map the rank-file ID to a sequence we report the ID as invalid and. Problems with many invalid IDs typically occur when one uses ID associated with different versions or even assemblies (like sequences hg19 and microArray probes from hg18). Invalid IDs are written to a file facilitating further investigation (file name: invalid_ids.txt).
 
 ### Other concerns
 Memory consumption and running time can vary significantly. 
