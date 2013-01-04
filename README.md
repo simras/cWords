@@ -16,11 +16,18 @@ The software has only been tested on a Unix platform (both Linux and Mac OS X Li
 ## 3. USAGE #
 Below is a short summary of how to use the software. The full set of options for each script can be be listed from the command line by using the '-h' flag.
  
-Example run:
+*** Example runs:
+    
+    tri-nucleotide background model, word sizes 6, 7 and 8, using 40 processors
+    jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 2 -p 40
 
-jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 2
+     IDs in you sequences and rank-file match
+    jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 2 -C
 
-Options:
+    Mononucleotide background model, Word Cluster Plot (highlighting ACATTCCA, ACATTCC, CATTCCA, ACATTC, CATTCC), Enrichment profile graphs for the 20 most significant words
+    jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 0 -mkplot ACATTCCA -gen_plot 20
+
+*** Options:
 
     Usage: cwords [options]
         -w, --wordsize ARG               word length(s) you wish to search in (default 6,7)
@@ -35,7 +42,7 @@ Options:
             --mkplot ARG                 Make Word Cluster Plot - highlight (with black border) the 8mer seed site (ex for miR-1: ACATTCCA) and its corresponding 7mer and 6mer seed sites. To highlight nothing write a word not in the [acgt] alphabet.
         -N, --noAnn                      No miRNA-annotation on the Word Cluster Plot
             --annotFile ARG              Supply you own annotations, for Word Cluster Plot and word ranking.
-            --species ARG                Different ID systems are used for different species, what's the species of your data? Currently we support Human Ensembl sequences as default (write human), Mouse (write mouse), Fruit Fly (write fruitfly) and Roundtype  Worm (write roundworm)
+            --species ARG                Different ID systems are used for different species, what's the species of your data? Currently we support Human Ensembl sequences as default (write human), Mouse (write mouse) and Fruit Fly (write fruitfly)
 
 ## 4. INTERPRETATION #
 
@@ -60,22 +67,13 @@ The final output of this analysis produces a summary of the top correlating word
 
 The 'z-score' is a correlation statistic for the given word after correction for correlations obtained from random gene list orderings. The 'fdr' (false discovery rate) is the estimated proportion of false discoveries for the given z-score threshold. Finally, 'ledge' is the leading-edge which denotes the position in the gene list where the maximum imbalance was measured; genes before this threshold are relatively enriched for the word compared to genes after the threshold.
 
-### Mono-nucleotide dependency model
-cwords -u 0 -w 5,6 -x -r seqweight.rnk -s seqs.fa -p 50 -q 50 -c pval -b 1
-
-### Di-nucleotide model
-cwords -u 0 -w 5,6 -x -r seqweight.rnk -s seqs.fa -p 50 -q 50 -c pval -b 2
-
-### tri-nucleotide model
-cwords -u 0 -w 5,6 -x -r seqweight.rnk -s seqs.fa -p 50 -q 50 -c pval -b 2
-
 ### -- Plots --
 Write about the plot ref. the paper
 
 ### -- Other concerns --
 Memory consumption and running time can vary significantly. 
 
-The word length (-w) has a significant impact on the, if you want to run for word lengths > 7 works best with 4GB or more (depending on number of genes in your analysis). Word lengths > 9 works best wih 10 GB or more.
+The word length (-w) has a significant impact on the, if you want to run for word lengths > 8 works best with 4 GB memory or more (depending on number of genes in your analysis). Word lengths > 9 works best wih 10 GB or more.
 
 ## 4. How TO CITE
 
