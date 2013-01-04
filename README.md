@@ -16,7 +16,7 @@ The software has only been tested on a Unix platform (both Linux and Mac OS X Li
 ## 3. USAGE #
 Below is a short summary of how to use the software. The full set of options for each script can be be listed from the command line by using the '-h' flag.
  
-*** Example runs:
+### Example runs:
     
     tri-nucleotide background model, word sizes 6, 7 and 8, using 40 processors
     jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 2 -p 40
@@ -27,7 +27,7 @@ Below is a short summary of how to use the software. The full set of options for
     Mononucleotide background model, Word Cluster Plot (highlighting ACATTCCA, ACATTCC, CATTCCA, ACATTC, CATTCC), Enrichment profile graphs for the 20 most significant words
     jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 0 -mkplot ACATTCCA -gen_plot 20
 
-*** Options:
+### Options:
 
     Usage: cwords [options]
         -w, --wordsize ARG               word length(s) you wish to search in (default 6,7)
@@ -46,13 +46,13 @@ Below is a short summary of how to use the software. The full set of options for
 
 ## 4. INTERPRETATION #
 
--- invalid IDs --
+### invalid IDs
 If you do not use -C the IDs in the rank-file will be mapped to the sequences. 
 
-### positive vs negative set -- ##
+### positive vs negative set 
 The analysis is divided into 2 passes; one where words that are over represented in up-regulated genes (ie. positively correlated words) and one where negatively correlated words is evalaluated. If all genes are considered in the analysis in each pass all words of the length in question will be divided into the negative set and positive set except the words that occur 5 or less times in the sequences. These sets can be divided in different ways (see options -h), and you can consider only most regulated genes in the two passes. If you consider the most down-regulated words in the negative pass amd the most up-regulated in the positive pass a word can be present in both the negative and the positive set.
 
-### -- The output -- ##
+### The output 
 The final output of this analysis produces a summary of the top correlating words (a list for each end of the ranked list), i.e. words over-represented in beginning of list:
 
     Top 10 words
@@ -67,10 +67,10 @@ The final output of this analysis produces a summary of the top correlating word
 
 The 'z-score' is a correlation statistic for the given word after correction for correlations obtained from random gene list orderings. The 'fdr' (false discovery rate) is the estimated proportion of false discoveries for the given z-score threshold. Finally, 'ledge' is the leading-edge which denotes the position in the gene list where the maximum imbalance was measured; genes before this threshold are relatively enriched for the word compared to genes after the threshold.
 
-### -- Plots --
+### Plots
 Write about the plot ref. the paper
 
-### -- Other concerns --
+### Other concerns
 Memory consumption and running time can vary significantly. 
 
 The word length (-w) has a significant impact on the, if you want to run for word lengths > 8 works best with 4 GB memory or more (depending on number of genes in your analysis). Word lengths > 9 works best wih 10 GB or more.
