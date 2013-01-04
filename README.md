@@ -14,18 +14,7 @@ The software has only been tested on a Unix platform (both Linux and Mac OS X Li
   make sure that you have the 'jruby' command in your path.
 
 ## 3. USAGE #
-Below is a short summary of how to use the software. The full set of options for each script can be be listed from the command line by using the '-h' flag.
- 
-### Example runs:
-    
-    tri-nucleotide background model, word sizes 6, 7 and 8, using 40 processors
-    jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 2 -p 40
-
-    IDs in you sequences and rank-file match
-    jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 2 -C
-
-    Mononucleotide background model, Word Cluster Plot (highlighting ACATTCCA, ACATTCC, CATTCCA, ACATTC, CATTCC), Enrichment profile graphs for the 20 most significant words
-    jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 0 -mkplot ACATTCCA -gen_plot 20
+Below is a short summary of how to use the software. The full set of options for each script can be be listed from the command line by using the '-h' flag. The most important ones are the following:
 
 ### Options:
 
@@ -43,6 +32,18 @@ Below is a short summary of how to use the software. The full set of options for
         -N, --noAnn                      No miRNA-annotation on the Word Cluster Plot
             --annotFile ARG              Supply you own annotations, for Word Cluster Plot and word ranking.
             --species ARG                Different ID systems are used for different species, what's the species of your data? Currently we support Human Ensembl sequences as default (write human), Mouse (write mouse) and Fruit Fly (write fruitfly)
+
+ 
+### Example runs:
+The following are standard analyses to run with cWords.    
+    tri-nucleotide background model, word sizes 6, 7 and 8, using 40 processors
+    jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 2 -p 40
+
+    IDs in you sequences and rank-file match
+    jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 2 -C
+
+    Mononucleotide background model, Word Cluster Plot (highlighting ACATTCCA, ACATTCC, CATTCCA, ACATTC, CATTCC), Enrichment profile graphs for the 20 most significant words
+    jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 0 -mkplot ACATTCCA -gen_plot 20
 
 ## 4. INTERPRETATION #
 Results mainly compose of three elements. A ranking of most strongly correlated word, a Word Cluster Plot and Enrichment profile plots. 
