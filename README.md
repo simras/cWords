@@ -65,9 +65,9 @@ The final output of this analysis produces a summary of the top correlating word
     6         tttatc    11.93     3.59      3.99e-03  3.88e-01  449
     ...
 
-*'z-score' is a correlation statistic for the given word after correction for correlations obtained from random gene list orderings.
-*'fdr' (false discovery rate) is the estimated proportion of false discoveries for the given z-score threshold.
-*'ledge' is the leading-edge which denotes the position in the gene list where the maximum imbalance was measured; genes before this threshold are relatively enriched for the word compared to genes after the threshold.
+* 'z-score' is a correlation statistic for the given word after correction for correlations obtained from random gene list orderings.
+* 'fdr' (false discovery rate) is the estimated proportion of false discoveries for the given z-score threshold.
+* 'ledge' is the leading-edge which denotes the position in the gene list where the maximum imbalance was measured; genes before this threshold are relatively enriched for the word compared to genes after the threshold.
 
 ### Plots
 Write about the plot ref. the paper
