@@ -66,6 +66,8 @@ options[:annotFile] = ""
 # NEW
 options[:species] = "human"
 options[:anders_ids] = false
+options[:pa_seq] = false
+options[:flatBgModel] = false
 
 posTopWords = Array.new(options[:genplot])
 negTopWords = Array.new(options[:genplot])
@@ -73,7 +75,7 @@ negTopWords = Array.new(options[:genplot])
 $coptions = OptionParser.new do |opts|
   opts.banner = "Usage: cwords [options]"
   
-  # analysis settings
+# analysis settings
 #  opts.on("-c", "--scoring_scheme ARG", "Scoring scheme - deprecated") {|o| options[:scoring_scheme] = o} 
 #  opts.on("-p", "--permutations ARG", "Number of list permutations - deprecated") {|o| options[:permutations] = o.to_i}
 #  opts.on("-q", "--shuffles ARG", "Number of sequence shuffles for sequence bias correction - deprecated") {|o| options[:seqshuffles] = o.to_i}
@@ -94,7 +96,7 @@ $coptions = OptionParser.new do |opts|
   opts.on(      "--inv_lead ARG", "Consider most down regulated genes when looking for positively correlated words and visa versa for up regulated genes") {|o| options[:inv_lead] = o.to_i}
   opts.on(      "--interval ARG", "Consider (like --interval n1,n2) an interval of genes (in the order of decreasing foldchange)") {|o| options[:intv] = o.split(",")}
   opts.on("-d", "--rank_dist", "Analyse only leading genes with Z-score > 0.5 or Z-score < -0.5 in the respective up and down regulation analysis") {|o| options[:dist] = true}
- 
+  opts.on("-F", "--flat_bg", "Use a background model that assumes all nucleotides (and di or trinucleotides) are equally probable.") {|o| options[:flatBgModel] = true}
 
   # files and directories
   opts.on("-r", "--rankfile ARG", "Rank file with IDs and one or more columns (will be mean collapsed) of a metric of expression changes (tab or space delimiter) or just one column with ordered IDs most down-regulated to most up-regulated") {|o| options[:rankfile] = o}
@@ -106,6 +108,7 @@ $coptions = OptionParser.new do |opts|
   opts.on(      "--report_words ARG", "Report only on following words (comma separated)") {|o| options[:report_words] = o.split(',')}
   opts.on(      "--plot_words ARG", "Only make plots for following words (comma separated)") {|o| options[:plot_words] = o.split(',')}
   opts.on(      "--one_plot_words ARG", "Make one plot with all following words (requires -x option to be set,comma separated)") {|o| options[:one_plot_words] = o.split(',')}
+  opts.on(      "--cooccur ARG", "Do following words cooccur") {|o| options[:cooccur] = o.split(',')}
   opts.on(      "--test", "Testing mode - log files generated") {|o| options[:testing] = true}
   opts.on("-R", "--report_top ARG", "Report top n words"){ |o| options[:report_top] = o.to_i}
   opts.on("-g", "--gene_set ARG", "Print out what genes indicated words are enriched in. write words as comma-separated list.") {|o| options[:gene_set] = o.split(',')}
@@ -116,6 +119,7 @@ $coptions = OptionParser.new do |opts|
   opts.on("-N", "--noAnn", "No miRNA-annotation on the Word Cluster Plot") {|o| options[:noAnn] = true}
   opts.on("--annotFile ARG", "Supply you own annotations, for Word Cluster Plot and word ranking.") {|o| options[:annotFile] = o}
 # NEW
+  opts.on("-P", "--PASeq", "By use of PolyA sequencing data you can assign the sequences a weight and the most probable UTR isoform will be selected.") {|o| options[:pa_seq] = true}
   opts.on(      "--species ARG", "Different ID systems are used for different species, what's the species of your data? Currently we support Human Ensembl sequences as default (write human), Mouse (write mouse), Fruit Fly (write fruitfly) and Roundtype  Worm (write roundworm)") {|o| options[:species] = o.downcase}
 end
 
@@ -148,20 +152,25 @@ if options[:intv] then
   end
 end
 
+# resolve conflict between options -A and -C
+if options[:anders_ids] && options[:custom_IDs] then
+  options[:custom_IDs] = false
+end
+
 # Checking if rank-file is correct format
 # NEW
-if system("head -1 " + options[:rankfile] + " | grep -x -P \"^[A-Za-z0-9_.]+\" 1> /dev/null") then
+if system("head -1 " + options[:rankfile] + " | grep -x -P \"^[A-Za-z0-9.,_:-;+]+\" 1> /dev/null") then
   ok = true
   # put extra line
   system(libdir + "addLines.sh " + options[:rankfile])
   options[:rankfile] =  options[:rankfile] + ".tmp"
-elsif system("head -1 " + options[:rankfile] + " | grep -P \"^[A-Za-z0-9._]+[\t ]+-?[0-9]\" 1> /dev/null") then
+elsif system("head -1 " + options[:rankfile] + " | grep -P \"^[A-Za-z0-9,._:-;+]+[\t ]+-?[0-9]\" 1> /dev/null") then
   ok = true
   # do nothing
 else
   ok = false
 end
-raise ArgumentError, 'rank-file (-r) should have only one column with ordered IDs of tap-separate columns' unless ok
+raise ArgumentError, 'rank-file (-r) should have only one column with ordered IDs of tap-separate columns. ID can only be composed of following characters a-z,A-Z,0-9 and .,_-;:+' unless ok
 
 testing = options[:testing]
 output_top = options[:report_top]
@@ -200,9 +209,9 @@ else
 end
 
 # generate annotation file
-#if Dir[annofile][0].nil? then
-#  system("python " + resdir + "add_annotation.py -a " + resdir + "mature.fa -o " + resdir + "annotations_" + options[:species] + ".tsv -p " + spepatt)
-#end
+if Dir[annofile][0].nil? then
+  system("python " + resdir + "add_annotation.py -a " + resdir + "mature.fa -o " + resdir + "annotations_" + options[:species] + ".tsv -p " + spepatt)
+end
 #annofile = basedir + "/resources/" + "annot_gap2.tsv" #annotation
 
 # read in annotations
@@ -285,37 +294,60 @@ if options[:custom_IDs]
   # Choose sequences that map to rank-file, if ID is ambigous choose longest sequence
   puts "\n>> reading sequences ..." if !options[:web] 
   sequences = Hash.new
-
+  num_reads = Hash.new
+  pa_reads = false
+  nrc = 0
   IO.readlines(options[:seqfile],">").each do |entry|
     ls = entry.split("\n").map{|x| x.chomp}
     if ls[1..(ls.size)].join('') == "Sequence unavailable>" then
       next
     end
     # NEW
-    tmpl = ls[0].split("|")
+    #if options[:pa_seq] then
+    tmpl = ls[0].split("#")
+#    print "--------- sharp -------------"
     if tmpl.size > 1 then
-      # Biomart ENSEMBL format
-      # 1st ID Genome
-      #ls[0] = tmpl[0]
-      # 2nd ID Transcript
-      ls[0] = tmpl[1]
+      pa_reads = true
+      ls[0] = tmpl[0]
+      tmp_num_reads =  tmpl[1].to_i
+      #print tmp_num_reads, "\n"
+    else
+      tmpl = ls[0].split("|")
+      if tmpl.size > 1 then
+        # Biomart ENSEMBL format
+        # 1st ID Genome
+        #ls[0] = tmpl[0]
+        # 2nd ID Transcript
+        ls[0] = tmpl[1]
+      end
     end
     if idmap[ls[0].chomp] then
       if sequences.has_key?(idmap[ls[0].chomp]) then
         newseq = ls[1..(ls.size)].join('').upcase.gsub('U','T').gsub('>','').gsub("SEQTENCE TNAVAILABLE",'')
        # filter by length
-       if newseq.size > sequences[idmap[ls[0].chomp]].size then
-          sequences[idmap[ls[0].chomp]] = newseq
+        if pa_reads then
+          if tmp_num_reads > num_reads[idmap[ls[0].chomp]] then
+            #print ls[0], " ",tmp_num_reads," ",newseq.size, "\n"
+            nrc = nrc + 1
+            sequences[idmap[ls[0].chomp]] = newseq
+          elsif tmp_num_reads == num_reads[idmap[ls[0].chomp]] && newseq.size > sequences[idmap[ls[0].chomp]].size then
+            sequences[idmap[ls[0].chomp]] = newseq
+          end
+        else
+          if newseq.size > sequences[idmap[ls[0].chomp]].size then
+            sequences[idmap[ls[0].chomp]] = newseq
+          end
         end
       else
         sequences[idmap[ls[0].chomp]] = ls[1..(ls.size)].join('').upcase.gsub('U','T').gsub('>','').gsub("SEQTENCE TNAVAILABLE",'') # last field is ">"
+        num_reads[idmap[ls[0].chomp]] = tmp_num_reads if pa_reads
         if sequences[idmap[ls[0].chomp]].size <= 0 then
           sequences.delete(idmap[ls[0].chomp])
         end
       end
     end
   end
-
+  print "nrc ",nrc if !options[:web]
 elsif options[:anders_ids] && options[:species] == "human" then
   # Use Anders' original ID framework - only Human
   filtered = 0  
@@ -351,38 +383,66 @@ elsif options[:anders_ids] && options[:species] == "human" then
   # Choose sequences that map to rank-file, if ID is ambigous choose longest sequence
   puts "\n>> reading sequences ..." if !options[:web] 
   sequences = Hash.new
-
+  num_reads = Hash.new
+  pa_reads = false
+  nrc = 0
+  
   IO.readlines(options[:seqfile],">").each do |entry|
     ls = entry.split("\n").map{|x| x.chomp}
     # NEW: Remove Sequence unavailable tags in ENSEMBL sequences
     if ls[1..(ls.size)].join('') == "Sequence unavailable>" then
       next
     end
-    tmpl = ls[0].split("|")
+#    print "--------- sharp -------------"
+    tmpl = ls[0].split("#")
     if tmpl.size > 1 then
-      # 1st ID Genome
-      #ls[0] = tmpl[0]
-      # 2nd ID Transcript
-      ls[0] = tmpl[1]
+      pa_reads = true
+      ls[0] = tmpl[0]
+      tmp_num_reads =  tmpl[1].to_i
+      #print tmp_num_reads,"\n"
+    else
+      tmpl = ls[0].split("|")
+      if tmpl.size > 1 then
+        # 1st ID Genome
+        #ls[0] = tmpl[0]
+        # 2nd ID Transcript
+        ls[0] = tmpl[1]
+      end
     end
     # if allh.has_key?(tid)
     tid = idmap[ls[0].chomp]
     if tid then
+#      print tmp_num_reads,"\n"
       if sequences.has_key?(tid) then
         newseq = ls[1..(ls.size)].join('').upcase.gsub('U','T').gsub('>','')
+        if pa_reads then
+#          print tmp_num_reads,"\n"
+          if tmp_num_reads > num_reads[idmap[tid]].to_i then
+            sequences[tid] = newseq
+            nrc = nrc + 1
+          elsif tmp_num_reads == num_reads[tid] && newseq.size > sequences[tid].size then
+            sequences[tid] = newseq
+          end
+        else
         # Choose longest
-        if newseq.size > sequences[tid].size then
-          sequences[tid] = newseq
+          if newseq.size > sequences[tid].size then
+            sequences[tid] = newseq
+          end
         end
       else
         sequences[tid] = ls[1..(ls.size)].join('').upcase.gsub('U','T').gsub('>','') # last field is ">"
+        num_reads[tid] = tmp_num_reads if pa_reads
         if sequences[tid].size <= 0 then
           sequences.delete(tid)
         end
       end
     end
   end
-
+  print "nrc ",nrc,"\n"
+#  ccc = 0
+#  ddd=0
+#  num_reads.values.each{|v|  if v != 0 then ccc=ccc+1 else ddd=ddd+1 end}
+#  print ccc," " ,ddd,"\n"
 else
   # read in mirbase seed family
   word_annotation = Hash.new("") 
@@ -411,6 +471,7 @@ else
   if options[:seqfile]
     puts "\n>> reading sequences ..." #if !options[:web] 
     sequences = Hash.new
+  #  num_reads = Hash.new if options[:pa_seq]
     seqLengths = Hash.new
     allSequences = Hash.new
     segIDFile = ""
@@ -433,7 +494,7 @@ else
           toFromID[0] = "ET"
           segIDFile = resdir + "genemap_" + spepatt + "_EG_ET.tsv"
           #print "Sequence ID 1 ",ls[0][0..3]," ",ls[1]
-        elsif ( (spepatt == "hsa" && ls[0].match(/^ENSG[0-9]+/)) || (spepatt == "mmu" && ls[0].match(/^ENSGMUS[0-9]+/)) || (spepatt == "dme" && ls[0].match(/^FBgn[0-9]+/)) ) then
+        elsif ( (spepatt == "hsa" && ls[0].match(/^ENSG[0-9]+/)) || (spepatt == "mmu" && ls[0].match(/^ENSGMUS[0-9]+/)) || (spepatt == "dme" && ls[0].match(/^FBgn[0-9]+/)) || (spepatt == "cel" && ls[0].match(/^[a-zA-Z]+\.?[0-9]+/)) ) then
           # ENST
           toFromID[0] = "EG"
           segIDFile = resdir + "genemap_" + spepatt + "_EG_ET.tsv"
@@ -448,7 +509,7 @@ else
         elsif spepatt == "hsa" && ls[0].match("^uc[A-Za-z0-9]+\.[0-9]+") then
           # UCSC    
           segIDFile = resdir + "genemap_" + spepatt + "_EG_UC.tsv"
-        elsif spepatt == "hsa" && ls[0].match(/^[ANXYZ][PCGMRTWZS]_[0-9]+/) then
+        elsif (spepatt == "hsa" && ls[0].match(/^[ANXYZ][PCGMRTWZS]_[0-9]+/)) || (spepatt == "cel" && ls[0].match(/^[ANXYZ][PCGMRTWZS]_[0-9]+/)) then
           # RefSeq
           segIDFile = resdir + "genemap_" + spepatt + "_EG_RS.tsv"
         elsif (spepatt == "hsa" || spepatt == "mmu" || spepatt == "dme") && ls[0].match(/^[A-Za-z0-9]+/) then
@@ -530,7 +591,7 @@ else
         toFromID[1] = "ET"
         segIDFile = resdir + "genemap_" + spepatt + "_EG_ET.tsv"
         #    print "Sequence ID 1 ",ls[0][0..3]," ",ls[1]
-      elsif ( (spepatt == "hsa" && ls[0].match(/^ENSG[0-9]+/)) || (spepatt == "mmu" && ls[0].match(/^ENSGMUS[0-9]+/)) || (spepatt == "dme" && ls[0].match(/^FBgn[0-9]+/)) ) then
+      elsif ( (spepatt == "hsa" && ls[0].match(/^ENSG[0-9]+/)) || (spepatt == "mmu" && ls[0].match(/^ENSGMUS[0-9]+/)) || (spepatt == "dme" && ls[0].match(/^FBgn[0-9]+/)) || (spepatt == "cel" && ls[0].match(/^[a-zA-Z]+\.?[0-9]+/)) ) then
         # ENST
         toFromID[1] = "EG"
         #   print "Sequence ID 2 ",ls[0][0..3]," ",ls[1]
@@ -655,19 +716,31 @@ end
 invFile.close
 
 all.sort!{|a,b| a[1] <=> b[1]} 
-
+if !options[:cooccur].nil? then
+  cooccur = false
+  coset = ""
+  coscore = []             
+end
 secondPass = false
 while(pass)
-  pass = false
-    
-  ###
-  ### Word enumeration (optional)
-  ###
   
-  wordscores = []
-
-  # Freeing Memory
-  JavaFreeMem.freeMem()
+  pass = false
+  if options[:cooccur] && !options[:one_plot_words].empty? then
+    tmpwords = options[:one_plot_words]
+    options[:one_plot_words] = []
+  end
+  if cooccur then
+    copass = true
+    options[:one_plot_words] = tmpwords if !tmpwords.nil?
+  end
+    ###
+    ### Word enumeration (optional)
+    ###
+  
+    wordscores = []
+    
+    # Freeing Memory
+    JavaFreeMem.freeMem()
   
   if sequences
     puts "\n>> Enumerating words in sequences"  if !options[:web] && !secondPass
@@ -749,7 +822,7 @@ while(pass)
           threadA[ij] = Thread.new{
             
             bE[ij] = BinomEvaluatorMult.new(ws,bg,outFileNArray[ij],ij)
-            ha[ij] = bE[ij].getHashArray()
+            ha[ij] = bE[ij].getHashArray(options[:flatBgModel])
             ha[ij].each{ |key,value|
               semaphore4.synchronize{
                 if newHash[calc_patt(key,ws)].nil? then
@@ -939,6 +1012,7 @@ while(pass)
     
     # Freeing Memory
     JavaFreeMem.freeMem()
+    
 
     # Do word correlation analysis
     options[:wordsize].each do |ws|
@@ -974,7 +1048,8 @@ while(pass)
             end
 
             # Get score distribution
-            score = Array.new(ngenes,0)     
+            score = Array.new(ngenes,0)
+            currscore = Array.new(ngenes,0)
             sdist = Array
             # synchronized access to newHash using semaphores
             semaphore.synchronize{
@@ -995,6 +1070,35 @@ while(pass)
                 next
               end
             }
+
+            # Check if words cooccur
+            if !options[:cooccur].nil? && copass then
+              if !options[:cooccur].include?(word2) then
+                #print coset, nm,"\n"
+                if coset != nm then
+                  #print "Reverse"
+                  coscore.each_with_index{|x,i|
+                    currscore[ngenes-i-1] = x                    
+                  }
+                  #currscore.reverse
+                else
+                  coscore.each_with_index{|x,i|
+                    currscore[i] = x                    
+                  }
+#                  currscore = coscore
+                end
+                #print "currscore ",currscore,"\n"
+                score.each_with_index{ |x,idx|
+                  if currscore[idx] > 0 && score[idx] > 0 then
+                    score[idx] = score[idx] + currscore[idx]
+                  else
+                    score[idx] = 0
+                  end
+                }
+              else
+                next
+              end
+            end
             
             # Calculate the observed running sum and descriptive statistics
             smean = score.to_statarray.mean
@@ -1017,9 +1121,29 @@ while(pass)
               end
             end
             
+            
             next if maxrs <= 0 || contrib_genes <= 5
             numpos=numpos+1               
             
+            # Get occurrence data of word of interest 
+            if !options[:cooccur].nil? && !copass then
+              if !cooccur then
+                if options[:cooccur].include?(word2) then
+                  #print copass, cooccur, "\n"
+                  print word2,maxrs,"/n"
+                  coset = nm
+                  coscore = score
+                  cooccur = true
+                  pass = true
+                else
+                  next
+                end
+              else
+                next
+              end
+            end
+            
+
             if options[:gene_set] then
               if options[:gene_set].include?(word2) then
                 word_seq_file = File.new(outDir + word2 + "." + nm + ".fa","w")
@@ -1116,7 +1240,7 @@ while(pass)
     JavaFreeMem.freeMem()
     
     # Calculation of pval, FDRs and preparation of summary output
-    puts "fdr calculation ..." if !options[:web]  && !secondPass
+#    puts "fdr calculation ..." if !options[:web]  && !secondPass
     fdrrank=[]
 
     fdrrank = pfdrz.map{|x| [x,nil]} if options[:permutations] != 0 # [zscore,word_report_index] 
@@ -1227,17 +1351,27 @@ while(pass)
         end
       end
       print "Plotting Word Cluster Plot - may take some minutes","\n" if !options[:web]
-      system(cmd + " > /dev/null")
+      system(cmd)# + " > /dev/null")
     end
-   end
-  
+  end
+    
   if options[:genplot] > 0 && options[:plot_pos_words].empty? && options[:plot_neg_words].empty? then
     print "\n Running a second pass to save data to be plotted ", "\n\n"
-    options[:plot_pos_words] = posTopWords
-    options[:plot_neg_words] = negTopWords
-    pass = true
-    secondPass  = true
+     if options[:cooccur].nil? then
+       secondPass  = true
+       options[:plot_pos_words] = posTopWords
+       options[:plot_neg_words] = negTopWords
+       pass = true
+    else
+      if copass then
+        secondPass  = true
+        options[:plot_pos_words] = posTopWords
+        options[:plot_neg_words] = negTopWords
+        pass = true
+      end
+    end
   end  
+ 
 end
 if options[:genplot] > 0 && !(options[:plot_pos_words].empty?) && !(options[:plot_neg_words].empty?) then
   print "Plotting graphs - may take 0.5-5 minutes","\n"
