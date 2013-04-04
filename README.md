@@ -31,7 +31,7 @@ Below is a short summary of how to use the software. The full set of options for
             --mkplot ARG                 Make Word Cluster Plot - highlight (with black border) the 8mer seed site (ex for miR-1: ACATTCCA) and its corresponding 7mer and 6mer seed sites. To highlight nothing write a word not in the [acgt] alphabet.
         -N, --noAnn                      No miRNA-annotation on the Word Cluster Plot
             --annotFile ARG              Supply you own annotations, for Word Cluster Plot and word ranking.
-            --species ARG                Different ID systems are used for different species, what's the species of your data? Currently we support Human Ensembl sequences as default (write human), Mouse (write mouse) and Fruit Fly (write fruitfly)
+            --species ARG                Different ID systems are used for different species, what's the species of your data? Currently we support Human Ensembl sequences as default (write human), Mouse (write mouse), Fruit Fly (write fruitfly) and C. elegans (write roundworm)
 
  
 ### Example runs:
