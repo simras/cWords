@@ -56,13 +56,17 @@ The analysis is divided into 2 passes; one where words that are over represented
 The final output of this analysis produces a summary of the top correlating words (a list for each end of the ranked list), i.e. words over-represented in beginning of list:
 
     Top 10 words
-    rank      word      RS        z-score   p-value   fdr       ledge
-    1         ttatc     13.92     4.00      2.00e-03  7.94e-01  449
-    2         atccc     12.79     3.78      3.99e-03  6.59e-01  417
-    3         gtaatc    8.24      3.75      2.00e-03  5.01e-01  280
-    4         gtgaaa    6.77      3.68      5.99e-03  4.56e-01  137
-    5         cctat     10.26     3.61      3.99e-03  4.45e-01  384
-    6         tttatc    11.93     3.59      3.99e-03  3.88e-01  449
+    rank            word            z-score         p-value         fdr             ledge           annotation     
+    1               cactgcc         22.54           1.00e-10        6.58e-09        1651            hsa-miR-34a-5p,hsa-miR-34c-5p,hsa-miR-449a,hsa-miR-449b-5p
+    2               actgcca         20.62           1.00e-10        6.98e-09        1115            hsa-miR-34a-5p,hsa-miR-34c-5p,hsa-miR-449a,hsa-miR-449b-5p,hsa-miR-548au-3p
+    3               cctgccc         20.54           1.00e-10        6.03e-09        2702            hsa-miR-6721-5p
+    4               ccctgcc         19.82           1.00e-10        6.17e-09        3252            hsa-miR-1207-5p,hsa-miR-4763-3p
+    5               ccctggg         18.74           1.00e-10        6.22e-09        3500            hsa-miR-1915-3p
+    6               ctgcccc         17.16           1.00e-10        5.73e-09        2546            hsa-miR-486-3p 
+    7               ctgccct         16.97           1.00e-10        5.69e-09        3248            hsa-miR-4632-5p,hsa-miR-4436b-3p
+    8               ccagccc         16.54           1.00e-10        6.47e-09        2690            hsa-miR-762,hsa-miR-4492,hsa-miR-4498,hsa-miR-5001-5p
+    9               ccccagc         16.53           1.00e-10        6.32e-09        2706            hsa-miR-4731-5p
+    10              ctgggcc         16.42           1.00e-10        5.90e-09        3524  
     ...
 
 * 'z-score' is a correlation statistic for the given word after correction for correlations obtained from random gene list orderings.
