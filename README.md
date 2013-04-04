@@ -76,7 +76,7 @@ The final output of this analysis produces a summary of the top correlating word
 ### Plots
 Write about the plot ref. the paper
 
-### invalid IDs
+### Invalid IDs
 If you do not use -C the IDs in the rank-file will be mapped to the sequences, when it was not possible to map the rank-file ID to a sequence we report the ID as invalid and. Problems with many invalid IDs typically occur when one uses ID associated with different versions or even assemblies (like sequences hg19 and microArray probes from hg18). Invalid IDs are written to a file facilitating further investigation (file name: invalid_ids.txt).
 
 ### Other concerns
