@@ -20,14 +20,10 @@ require 'thread'
 require 'java'
 require libdir + 'BinomEvaluatorMult.jar'
 require libdir + 'PermutationStats.jar'
-#require libdir + 'ushuffle.jar'
-#require libdir + 'DS.jar'
 require libdir + 'JavaFreeMem.jar'
 java_import 'BinomEvaluatorMult'
 java_import 'JavaFreeMem'
 java_import 'PermutationStats'
-#java_import 'UShuffle'
-#java_import 'DS'
 
 # Default options
 options = Hash.new
@@ -50,7 +46,7 @@ options[:gene_set]=nil
 options[:lead]=nil
 options[:inv_lead]=nil
 options[:web]=false
-options[:bg] = "3"
+options[:bg] = "1"
 options[:threads]=1
 options[:genplot]=0
 options[:report_top]=10
@@ -80,7 +76,7 @@ $coptions = OptionParser.new do |opts|
 #  opts.on("-p", "--permutations ARG", "Number of list permutations - deprecated") {|o| options[:permutations] = o.to_i}
 #  opts.on("-q", "--shuffles ARG", "Number of sequence shuffles for sequence bias correction - deprecated") {|o| options[:seqshuffles] = o.to_i}
   opts.on("-w", "--wordsize ARG", "word length(s) you wish to search in (default 6,7)") { |o| options[:wordsize] = o.split(",").map{|x| x.to_i}}
-  opts.on("-b", "--bg ARG", "Order of Markov background nucleotide model (default 2)") {|o| options[:bg] = (o.to_i + 1).to_s}
+  opts.on("-b", "--bg ARG", "Order of Markov background nucleotide model (default 0)") {|o| options[:bg] = (o.to_i + 1).to_s}
   opts.on("-t", "--threads ARG", "use multiple threads to parallelize computations (default 1)") {|o| options[:threads] = o.to_i}
 #  opts.on(      "--split_words WORDS", "split sequence set based on occurrences of words") {|o| options[:split_words] = o.split(",")}
   opts.on(      "--onlyanno", "only process annotated (i.e. mirbase) words") {|o| options[:onlyanno] = true}
