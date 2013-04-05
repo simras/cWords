@@ -135,7 +135,7 @@ end
 
 [:rankfile].each{|p| show_help("option '#{p}' mandatory") if options[p].nil?}
 show_help("seqfile required") if !options[:seqfile]
-show_help("scoring scheme must be one of: obs,bin,pval,bpval") if !(['obs','bin','pval','bpval'].include?(options[:scoring_scheme]))
+show_help("scoring scheme must be: bpval") if !(['bpval'].include?(options[:scoring_scheme]))
 
 
 # Gene intervals are converted for easier access
@@ -490,7 +490,7 @@ else
           toFromID[0] = "ET"
           segIDFile = resdir + "genemap_" + spepatt + "_EG_ET.tsv"
           #print "Sequence ID 1 ",ls[0][0..3]," ",ls[1]
-        elsif ( (spepatt == "hsa" && ls[0].match(/^ENSG[0-9]+/)) || (spepatt == "mmu" && ls[0].match(/^ENSGMUS[0-9]+/)) || (spepatt == "dme" && ls[0].match(/^FBgn[0-9]+/)) || (spepatt == "cel" && ls[0].match(/^[a-zA-Z]+\.?[0-9]+/)) ) then
+        elsif ( (spepatt == "hsa" && ls[0].match(/^ENSG[0-9]+/)) || (spepatt == "mmu" && ls[0].match(/^ENSGMUS[0-9]+/)) || (spepatt == "dme" && ls[0].match(/^FBgn[0-9]+/)) || (spepatt == "cel" && ls[0].match(/^[a-zA-Z0-9]+\.[0-9]+/)) ) then
           # ENST
           toFromID[0] = "EG"
           segIDFile = resdir + "genemap_" + spepatt + "_EG_ET.tsv"
@@ -587,7 +587,7 @@ else
         toFromID[1] = "ET"
         segIDFile = resdir + "genemap_" + spepatt + "_EG_ET.tsv"
         #    print "Sequence ID 1 ",ls[0][0..3]," ",ls[1]
-      elsif ( (spepatt == "hsa" && ls[0].match(/^ENSG[0-9]+/)) || (spepatt == "mmu" && ls[0].match(/^ENSGMUS[0-9]+/)) || (spepatt == "dme" && ls[0].match(/^FBgn[0-9]+/)) || (spepatt == "cel" && ls[0].match(/^[a-zA-Z]+\.?[0-9]+/)) ) then
+      elsif ( (spepatt == "hsa" && ls[0].match(/^ENSG[0-9]+/)) || (spepatt == "mmu" && ls[0].match(/^ENSGMUS[0-9]+/)) || (spepatt == "dme" && ls[0].match(/^FBgn[0-9]+/)) || (spepatt == "cel" && ls[0].match(/^[a-zA-Z0-9]+\.?[0-9]+/)) ) then
         # ENST
         toFromID[1] = "EG"
         #   print "Sequence ID 2 ",ls[0][0..3]," ",ls[1]
