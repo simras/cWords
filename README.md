@@ -38,16 +38,16 @@ Below is a short summary of how to use the software. The full set of options for
 The following are standard analyses to run with cWords.
     
     tri-nucleotide background model, word sizes 6, 7 and 8, using 40 processors
-    jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 2 -p 40
+    jruby -J-Xmx4g scripts/cwords_Mult_MEM.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 2 -p 40
 
     IDs in you sequences and rank-file match
-    jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 2 -C
+    jruby -J-Xmx4g scripts/cwords_Mult_MEM.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 2 -C
 
-    Mononucleotide background model, Word Cluster Plot (highlighting ACATTCCA, ACATTCC, CATTCCA, ACATTC, CATTCC), Enrichment profile graphs for the 20 most significant words
-    jruby -J-Xmx4g scripts/cwords.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 0 -mkplot ACATTCCA -gen_plot 20
+    Mononucleotide background model, word cluster plot (highlighting ACATTCCA, ACATTCC, CATTCCA, ACATTC, CATTCC), Enrichment profile graphs for the 20 most significant words
+    jruby -J-Xmx4g scripts/cwords_Mult_MEM.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 0 -mkplot ACATTCCA -gen_plot 20
 
 ## 4. INTERPRETATION #
-Results mainly compose of three elements. A ranking of most strongly correlated word, a Word Cluster Plot and Enrichment profile plots. 
+Results mainly compose of three elements. A ranking of most strongly correlated word, a word cluster plot and Enrichment profile plots. 
 
 ### Positive and negative set 
 The analysis is divided into 2 passes; one where words that are over represented in up-regulated genes (ie. positively correlated words) and one where negatively correlated words is evalaluated. If all genes are considered in the analysis in each pass all words of the length in question will be divided into the negative set and positive set except the words that occur 5 or less times in the sequences. These sets can be divided in different ways (see options -h), and you can consider only most regulated genes in the two passes. If you consider the most down-regulated words in the negative pass amd the most up-regulated in the positive pass a word can be present in both the negative and the positive set.
@@ -73,20 +73,16 @@ The final output of this analysis produces a summary of the top correlating word
 * 'fdr' (false discovery rate) is the estimated proportion of false discoveries for the given z-score threshold.
 * 'ledge' is the leading-edge which denotes the position in the gene list where the maximum imbalance was measured; genes before this threshold are relatively enriched for the word compared to genes after the threshold.
 
-### Plots
-Write about the plot ref. the paper
-
 ### Invalid IDs
 If you do not use -C the IDs in the rank-file will be mapped to the sequences, when it was not possible to map the rank-file ID to a sequence we report the ID as invalid and. Problems with many invalid IDs typically occur when one uses ID associated with different versions or even assemblies (like sequences hg19 and microArray probes from hg18). Invalid IDs are written to a file facilitating further investigation (file name: invalid_ids.txt).
 
 ### Other concerns
-Memory consumption and running time can vary significantly. 
+Memory consumption and running time can vary a lot. The word length (-w) has a significant impact on this, if you want to run for word lengths > 8 works best with 4 GB memory or more (depending on number of genes in your analysis). Word lengths > 9 works best wih 10 GB or more.
 
-The word length (-w) has a significant impact on the, if you want to run for word lengths > 8 works best with 4 GB memory or more (depending on number of genes in your analysis). Word lengths > 9 works best wih 10 GB or more.
-
-Generally running time grows exponentially with word length and linearly with the number of sequences that need to be analysed.
+Generally running time grows exponentially with word length and linearly with the number of bases in the sequences that need to be analysed.
 
 ## 4. How TO CITE
+Rasmussen S, Jacobsen A and Krogh A;cWords - systematic microRNA regulatory motif discovery from mRNA expression data; Silence (2013)
 
 ## 5. LICENSE
 Copyright (c) 2011, Simon H. Rasmussen.
