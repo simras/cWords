@@ -343,7 +343,7 @@ if options[:custom_IDs]
       end
     end
   end
-  print "nrc ",nrc if !options[:web]
+  #print "nrc ",nrc if !options[:web]
 elsif options[:anders_ids] && options[:species] == "human" then
   # Use Anders' original ID framework - only Human
   filtered = 0  
@@ -434,7 +434,7 @@ elsif options[:anders_ids] && options[:species] == "human" then
       end
     end
   end
-  print "nrc ",nrc,"\n"
+  #print "nrc ",nrc,"\n"
 #  ccc = 0
 #  ddd=0
 #  num_reads.values.each{|v|  if v != 0 then ccc=ccc+1 else ddd=ddd+1 end}
