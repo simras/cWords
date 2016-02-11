@@ -1,4 +1,4 @@
-cWords is a software tool that measure correlations of short oligonucleotide sequence ('words') occurrences and i.e. expression changes in a given experiment. In summary, it produces a statistic that a given word is overrepresented near the extremity of a ranked list of sequences.
+cWords is a software tool that measure correlations of short oligonucleotide sequence (word) occurrences and i.e. expression changes in a two condition experiment. In summary, it produces a statistic that quantifies overrepresented a word is near the extremity of a ranked list of sequences.
 
 ## 1. REQUIREMENTS #
 
@@ -20,12 +20,12 @@ Below is a short summary of how to use the software. The full set of options for
 
     Usage: cwords [options]
         -w, --wordsize ARG               word length(s) you wish to search in (default 6,7)
-        -b, --bg ARG                     Order of Markov background nucleotide model (default 2)
+        -b, --bg ARG                     Order of Markov background nucleotide model (default 0)
         -t, --threads ARG                use multiple threads to parallelize computations (default 1)
         -C, --custom_IDs                 Use your own sequences with matching IDs in rank and sequence files
-        -A, --anders_ids                 Use Anders' integer IDs
+        -A, --anders_ids                 Use integer IDs
         -x, --rank_split_mean            Split ranked list at mean
-        -r, --rankfile ARG               Rank file with IDs and one or more columns (will be mean collapsed) of a metric of expression changes (tab or space delimiter) or just one column with ordered IDs most down-regulated to most up-regulated
+        -r, --rankfile ARG               Rank file with IDs and one or more columns (will calculate mean across columns) of a metric of expression changes (tab or space delimiter) or just one column with ordered IDs most down-regulated to most up-regulated
         -s, --seqfile ARG                Sequence file - Rank and sequence IDs should be one of the compatible IDs for the species you use
             --gen_plot ARG               Generate plot data and plots for the top k words, takes 2 passes.
             --mkplot ARG                 Make Word Cluster Plot - highlight (with black border) the 8mer seed site (ex for miR-1: ACATTCCA) and its corresponding 7mer and 6mer seed sites. To highlight nothing write a word not in the [acgt] alphabet.
@@ -86,4 +86,4 @@ Rasmussen S, Jacobsen A and Krogh A;cWords - systematic microRNA regulatory moti
 
 ## 5. LICENSE
 Copyright (c) 2011, Simon H. Rasmussen.
-The software is open source and released under the MIT license (license is included).
+The software is open source and released under the MIT license.
