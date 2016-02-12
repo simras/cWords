@@ -155,12 +155,12 @@ end
 
 # Checking if rank-file is correct format
 # NEW
-if system("head -1 " + options[:rankfile] + " | grep -x -P \"^[A-Za-z0-9.,_:-;+]+\" 1> /dev/null") then
+if system("head -1 " + options[:rankfile] + " | egrep -x \"^[A-Za-z0-9.,_:-;+]+\" 1> /dev/null") then
   ok = true
   # put extra line
   system(libdir + "addLines.sh " + options[:rankfile])
   options[:rankfile] =  options[:rankfile] + ".tmp"
-elsif system("head -1 " + options[:rankfile] + " | grep -P \"^[A-Za-z0-9,._:-;+]+[\t ]+-?[0-9]\" 1> /dev/null") then
+elsif system("head -1 " + options[:rankfile] + " | egrep \"^[A-Za-z0-9,._:-;+]+[\t ]+-?[0-9]\" 1> /dev/null") then
   ok = true
   # do nothing
 else
