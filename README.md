@@ -2,8 +2,8 @@ cWords is a software tool that measure correlations of short oligonucleotide seq
 
 ## 1. REQUIREMENTS #
 
-All software components require Ruby (>=1.8.6, http://www.ruby-lang.org/) and JRuby (>=1.4.0, http://jruby.org/).
-The software has only been tested on a Unix platform (both Linux and Mac OS X Lion).
+All software components require Ruby (2.2 or newer, http://www.ruby-lang.org/) and JRuby (9.0.5.0 or newer, http://jruby.org/).
+The software has only been tested on a Unix platform (both Linux and Mac OS X Capitan).
 
 
 ## 2. INSTALL #
