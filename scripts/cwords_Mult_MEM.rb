@@ -1304,7 +1304,7 @@ while(pass)
     end
     
     if options[:dump] >= 0 && !secondPass then
-      fname = rankfilename + options[:wordsize].to_s + ".#{nm}." + options[:dump].to_s 
+      fname = rankfilename + options[:wordsize].join("") + ".#{nm}." + options[:dump].to_s 
       of = File.new(outDir + fname,"w")
       of.puts ['rank','word','z-score','p-value','fdr','ledge','annotation'].map{|x| sprintf("%s",x)}.join(' ')
       puts "dumping top #{options[:dump]} words in file: #{fname}" #if !options[:web] 
