@@ -81,9 +81,9 @@ Memory consumption and running time can vary a lot. The word length (-w) has a s
 
 Generally running time grows exponentially with word length and linearly with the number of bases in the sequences that need to be analysed.
 
-## 4. How TO CITE
+## 5. How TO CITE
 Rasmussen S, Jacobsen A and Krogh A;cWords - systematic microRNA regulatory motif discovery from mRNA expression data; Silence (2013)
 
-## 5. LICENSE
+## 6. LICENSE
 Copyright (c) 2011, Simon H. Rasmussen.
 The software is open source and released under the MIT license.
