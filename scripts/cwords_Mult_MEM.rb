@@ -72,13 +72,9 @@ $coptions = OptionParser.new do |opts|
   opts.banner = "Usage: cwords [options]"
   
 # analysis settings
-#  opts.on("-c", "--scoring_scheme ARG", "Scoring scheme - deprecated") {|o| options[:scoring_scheme] = o} 
-#  opts.on("-p", "--permutations ARG", "Number of list permutations - deprecated") {|o| options[:permutations] = o.to_i}
-#  opts.on("-q", "--shuffles ARG", "Number of sequence shuffles for sequence bias correction - deprecated") {|o| options[:seqshuffles] = o.to_i}
   opts.on("-w", "--wordsize ARG", "word length(s) you wish to search in (default 6,7)") { |o| options[:wordsize] = o.split(",").map{|x| x.to_i}}
   opts.on("-b", "--bg ARG", "Order of Markov background nucleotide model (default 0)") {|o| options[:bg] = (o.to_i + 1).to_s}
   opts.on("-t", "--threads ARG", "use multiple threads to parallelize computations (default 1)") {|o| options[:threads] = o.to_i}
-#  opts.on(      "--split_words WORDS", "split sequence set based on occurrences of words") {|o| options[:split_words] = o.split(",")}
   opts.on(      "--onlyanno", "only process annotated (i.e. mirbase) words") {|o| options[:onlyanno] = true}
   opts.on("-C", "--custom_IDs", "Use your own sequences with matching IDs in rank and sequence files") {|o| options[:custom_IDs] = true}
   opts.on("-A", "--anders_ids", "Use Anders' integer IDs") {|o| options[:anders_ids] = true}
@@ -155,12 +151,14 @@ end
 
 # Checking if rank-file is correct format
 # NEW
-if system("head -1 " + options[:rankfile] + " | egrep -x \"^[A-Za-z0-9.,_:-;+]+\" 1> /dev/null") then
+  # egrep -x ^[A-Za-z0-9.,_:\\+\;-]+
+  # egrep -x ^[A-Za-z0-9.,_:\\+\;-]+[\t" "]+-?[0-9]
+if system("head -1 " + options[:rankfile] + " | egrep -x ^[A-Za-z0-9.,_:\\+\;-]+ 1> /dev/null") then
   ok = true
   # put extra line
   system(libdir + "addLines.sh " + options[:rankfile])
   options[:rankfile] =  options[:rankfile] + ".tmp"
-elsif system("head -1 " + options[:rankfile] + " | egrep \"^[A-Za-z0-9,._:-;+]+[\t ]+-?[0-9]\" 1> /dev/null") then
+elsif system("head -1 " + options[:rankfile] + " | egrep -x ^[A-Za-z0-9.,_:\\+\;-]+[\t" "]+-?[0-9] 1> /dev/null") then
   ok = true
   # do nothing
 else
