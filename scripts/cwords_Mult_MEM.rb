@@ -7,12 +7,13 @@
 ########################################################
 
 srcdir = File.dirname(__FILE__)
-basedir = srcdir + "/../"
-libdir = basedir + '/lib/'
-resdir = basedir + '/resources/'
+basedir = File.expand_path("..", srcdir) + "/"
+libdir = File.expand_path("..",  srcdir) + '/lib/'
+resdir = File.expand_path("..",  srcdir) + '/resources/'
+
 $LOAD_PATH << libdir
 
-require 'wordRS-lib.rb'
+require libdir + 'wordRS-lib.rb'
 require 'progressbar'
 require 'optparse'
 require 'rubygems'
@@ -99,7 +100,8 @@ $coptions = OptionParser.new do |opts|
   # files and directories
   opts.on("-r", "--rankfile ARG", "Rank file with IDs and one or more columns (will be mean collapsed) of a metric of expression changes (tab or space delimiter) or just one column with ordered IDs most down-regulated to most up-regulated") {|o| options[:rankfile] = o}
   opts.on("-s", "--seqfile ARG", "Sequence file - Rank and sequence IDs should be one of the compatible IDs for the species you use") {|o| options[:seqfile] = o}
-  
+  opts.on("-P", "--PASeq", "By use of PolyA sequencing data you can assign the sequences a weight and the most probable UTR isoform will be selected.") {|o| options[:pa_seq] = true}
+
   # output control
   opts.on(      "--gen_plot ARG", "Generate plot data and plots for the top k words, takes 2 passes.") {|o| options[:genplot] = o.to_i }
   opts.on("-u", "--dump ARG", "Dump top words in file - 0 means all") { |o| options[:dump] = o.to_i}
@@ -285,30 +287,45 @@ if options[:custom_IDs]
   # Choose sequences that map to rank-file, if ID is ambigous choose longest sequence
   puts "\n>> reading sequences ..." if !options[:web] 
   sequences = Hash.new
-
+  num_reads = Hash.new if options[:pa_seq]
   IO.readlines(options[:seqfile],">").each do |entry|
     ls = entry.split("\n").map{|x| x.chomp}
     if ls[1..(ls.size)].join('') == "Sequence unavailable>" then
       next
     end
     # NEW
-    tmpl = ls[0].split("|")
-    if tmpl.size > 1 then
-      # Biomart ENSEMBL format
-      # 1st ID Genome
-      #ls[0] = tmpl[0]
-      # 2nd ID Transcript
-      ls[0] = tmpl[1]
+    if options[:pa_seq] then
+      tmpl = ls[0].split("|")
+      ls[0] = tmpl[0]
+      tmp_num_reads =  tmpl[1]
+    else
+      tmpl = ls[0].split("|")
+      if tmpl.size > 1 then
+        # Biomart ENSEMBL format
+        # 1st ID Genome
+        #ls[0] = tmpl[0]
+        # 2nd ID Transcript
+        ls[0] = tmpl[1]
+      end
     end
     if idmap[ls[0].chomp] then
       if sequences.has_key?(idmap[ls[0].chomp]) then
         newseq = ls[1..(ls.size)].join('').upcase.gsub('U','T').gsub('>','').gsub("SEQTENCE TNAVAILABLE",'')
-       # filter by length
-       if newseq.size > sequences[idmap[ls[0].chomp]].size then
-          sequences[idmap[ls[0].chomp]] = newseq
+        # filter by length
+        if options[:pa_seq]
+          if tmp_num_reads > num_reads[idmap[ls[0].chomp]] then
+            sequences[idmap[ls[0].chomp]] = newseq
+          elsif tmp_num_reads == num_reads[idmap[ls[0].chomp]] && newseq.size > sequences[idmap[ls[0].chomp]].size then
+            sequences[idmap[ls[0].chomp]] = newseq
+          end
+        else
+          if newseq.size > sequences[idmap[ls[0].chomp]].size then
+            sequences[idmap[ls[0].chomp]] = newseq
+          end
         end
       else
         sequences[idmap[ls[0].chomp]] = ls[1..(ls.size)].join('').upcase.gsub('U','T').gsub('>','').gsub("SEQTENCE TNAVAILABLE",'') # last field is ">"
+        num_reads[idmap[ls[0].chomp]] = tmp_num_reads if options[:pa_seq]
         if sequences[idmap[ls[0].chomp]].size <= 0 then
           sequences.delete(idmap[ls[0].chomp])
         end
