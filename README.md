@@ -1,4 +1,4 @@
-cWords is a software tool that measure correlations of short oligonucleotide sequence (word) occurrences and i.e. expression changes in a two condition experiment. In summary, it produces a statistic that quantifies overrepresented a word is near the extremity of a ranked list of sequences.
+cWords is a software tool that measure correlations of short oligonucleotide sequence (word) occurrences and i.e. expression changes in a two condition experiment. In summary, it produces a statistic that quantifies how over-represented a word is in a ranked list of sequences.
 
 ## 1. REQUIREMENTS #
 
@@ -14,7 +14,7 @@ The software has only been tested on a Unix platform (both Linux and Mac OS X Ca
   make sure that you have the 'jruby' command in your path.
 
 ## 3. USAGE #
-Below is a short summary of how to use the software. The full set of options for each script can be be listed from the command line by using the '-h' flag. The most important ones are the following:
+The full list of options for each script is available by running the program with -h flag. Here the main options are described.
 
 ### Options:
 
@@ -35,7 +35,7 @@ Below is a short summary of how to use the software. The full set of options for
 
  
 ### Example runs:
-The following are standard analyses to run with cWords.
+cWords is built to utilize many cores in parallel on a large computer. The following are standard analyses to run with cWords.
     
     tri-nucleotide background model, word sizes 6, 7 and 8, using 40 processors
     jruby -J-Xmx4g scripts/cwords_Mult_MEM.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 2 -p 40
@@ -47,10 +47,10 @@ The following are standard analyses to run with cWords.
     jruby -J-Xmx4g scripts/cwords_Mult_MEM.rb -s <fasta-file> -r <rank-file> -w 6,7,8 -b 0 -mkplot ACATTCCA -gen_plot 20
 
 ## 4. INTERPRETATION #
-Results mainly compose of three elements. A ranking of most strongly correlated word, a word cluster plot and Enrichment profile plots. 
+Results mainly compose of three elements. A ranking of most strongly correlated words, a word cluster plot and enrichment profile plots. 
 
 ### Positive and negative set 
-The analysis is divided into 2 passes; one where words that are over represented in up-regulated genes (ie. positively correlated words) and one where negatively correlated words is evalaluated. If all genes are considered in the analysis in each pass all words of the length in question will be divided into the negative set and positive set except the words that occur 5 or less times in the sequences. These sets can be divided in different ways (see options -h), and you can consider only most regulated genes in the two passes. If you consider the most down-regulated words in the negative pass amd the most up-regulated in the positive pass a word can be present in both the negative and the positive set.
+The analysis is divided into 2 passes; one where words that are over-represented in up-regulated genes (ie. positively correlated words) and one where negatively correlated words are evaluated. If all genes are included in the analysis in each pass, all words of the length in question will be divided into the negative set and positive set except the words that occur 5 or less times across all sequences. These sets can be divided in different ways (see options -h), and you can consider only most regulated genes in the two passes. If you consider the most down-regulated words in the negative pass and the most up-regulated in the positive pass, the same word will be present in both the negative and the positive set.
 
 ### The output 
 The final output of this analysis produces a summary of the top correlating words (a list for each end of the ranked list), i.e. words over-represented in beginning of list:
@@ -76,7 +76,7 @@ The final output of this analysis produces a summary of the top correlating word
 ### Invalid IDs
 If you do not use -C the IDs in the rank-file will be mapped to the sequences, when it was not possible to map the rank-file ID to a sequence we report the ID as invalid and. Problems with many invalid IDs typically occur when one uses ID associated with different versions or even assemblies (like sequences hg19 and microArray probes from hg18). Invalid IDs are written to a file facilitating further investigation (file name: invalid_ids.txt).
 
-### Other concerns
+### Computer resources
 Memory consumption and running time can vary a lot. The word length (-w) has a significant impact on this, if you want to run for word lengths > 8 works best with 4 GB memory or more (depending on number of genes in your analysis). Word lengths > 9 works best wih 10 GB or more.
 
 Generally running time grows exponentially with word length and linearly with the number of bases in the sequences that need to be analysed.
